@@ -25,7 +25,15 @@ def startup_load_parquet():
         ) from e
 
 
-@app.get("/order/{order_id}", response_model=Order)
+@app.get(
+    "/order/{order_id}",
+    response_model=Order,
+    responses={
+        200: {"description": "Order found"},
+        404: {"description": "Order not found"},
+        503: {"description": "Service unavailable"},
+    },
+)
 def get_order(order_id: str):
     """Get a single order by order_id."""
     try:
@@ -37,7 +45,14 @@ def get_order(order_id: str):
         raise HTTPException(status_code=503, detail=str(e))
 
 
-@app.get("/sales-per-city", response_model=list[SalesPerCity])
+@app.get(
+    "/sales-per-city",
+    response_model=list[SalesPerCity],
+    responses={
+        200: {"description": "Sales per city"},
+        503: {"description": "Service unavailable"},
+    },
+)
 def get_sales_per_city():
     """Get total sales grouped by city."""
     try:
