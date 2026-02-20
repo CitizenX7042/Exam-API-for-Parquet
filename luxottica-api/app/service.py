@@ -25,12 +25,13 @@ def get_order(order_id: str) -> Order | None:
     if row.empty:
         return None
     record = row.iloc[0].to_dict()
-    # Convert order_time to string (handle NaT/NaN)
-    ot = record.get("order_time")
-    if pd.isna(ot):
-        record["order_time"] = ""
-    elif hasattr(ot, "isoformat"):
-        record["order_time"] = ot.isoformat()
+    # Sanitize NaN/NaT to prevent 422 response validation errors
+    str_fields = ("order_id", "customer_name", "email", "product", "city", "status", "order_time")
+    for key, val in record.items():
+        if pd.isna(val):
+            record[key] = "" if key in str_fields else 0
+        elif hasattr(val, "isoformat"):
+            record[key] = val.isoformat()
     return Order(**record)
 
 
